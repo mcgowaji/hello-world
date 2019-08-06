@@ -1,0 +1,54 @@
+SQL Foundations 2: Aggregates
+
+1.	SELECT DISTINCT(country)
+a.	FROM ksprojects;
+
+2.	SELECT COUNT(DISTINCT(main_category))
+a.	FROM ksprojects;
+
+3.	SELECT DISTINCT(main_category), category
+a.	FROM ksprojects
+b.	ORDER BY main_category;
+
+4.	SELECT main_category, COUNT(DISTINCT category)
+a.	FROM ksprojects
+b.	GROUP BY main_category;
+
+5.	SELECT main_category, ROUND(AVG(backers), 0) AS average_backers
+a.	FROM ksprojects
+b.	GROUP BY main_category
+c.	ORDER BY ROUND(AVG(backers)) DESC;
+
+6.	SELECT category, COUNT(state) AS successful_counts, ROUND(AVG(pledged - goal)) AS avg_difference
+a.	FROM ksprojects
+b.	WHERE state = 'successful'
+c.	GROUP BY category;
+
+7.	SELECT main_category, COUNT(main_category) AS no_backer_projects, MAX(goal)
+a.	FROM ksprojects
+b.	WHERE backers = 0
+c.	GROUP BY main_category;
+
+8.	SELECT category, ROUND(AVG(usd_pledged/ NULLIF(backers, 0))) AS avg_usd_per_backers
+a.	FROM ksprojects
+b.	GROUP BY category
+c.	HAVING AVG(usd_pledged/ NULLIF(backers, 0)) < 50
+d.	ORDER BY AVG(usd_pledged/ NULLIF(backers, 0)) DESC;
+
+9.	SELECT main_category, COUNT(state) AS total_successful
+a.	FROM ksprojects
+b.	WHERE backers BETWEEN 5 AND 10
+c.	AND state= 'successful'
+d.	GROUP BY main_category;
+
+10.	SELECT currency, SUM(pledged)
+a.	FROM ksprojects
+b.	GROUP BY currency
+c.	ORDER BY SUM(pledged) DESC;
+
+11.	SELECT main_category, SUM(backers)
+a.	FROM ksprojects
+b.	WHERE state= 'successful' AND main_category != 'Games' AND main_category != 'Technology'
+c.	GROUP BY main_category
+d.	HAVING SUM(backers) > 100000
+e.	ORDER BY main_category;
