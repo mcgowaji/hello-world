@@ -1,0 +1,90 @@
+SQL Foundations III: Joining Data
+
+1.	See schema at draw.io
+
+2.	SELECT namefirst, namelast, inducted 
+a.	FROM people LEFT OUTER JOIN hof_inducted
+b.	ON people.playerid = hof_inducted.playerid;
+
+3.	SELECT namefirst, namelast, birthyear, deathyear, birthcountry
+a.	FROM people LEFT OUTER JOIN hof_inducted
+b.	ON people.playerid = hof_inducted.playerid
+c.	WHERE hof_inducted.votedby = 'Negro League' AND hof_inducted.yearid = 2006;
+
+4.	SELECT salaries.yearid, salaries.playerid, teamid, salary, category
+a.	FROM salaries INNER JOIN hof_inducted
+b.	ON salaries.playerid = hof_inducted.playerid;
+
+5.	SELECT salaries.playerid, salaries.yearid, teamid, lgid, salary, inducted
+a.	FROM salaries FULL OUTER JOIN hof_inducted
+b.	ON salaries.playerid = hof_inducted.playerid;
+
+6.	Part 1: SELECT salaries.playerid, salaries.yearid, teamid, lgid, salary, inducted
+  	FROM salaries FULL OUTER JOIN hof_inducted
+    ON salaries.playerid = hof_inducted.playerid;
+  	Part 2:  SELECT DISTINCT(playerid)
+  	FROM hof_inducted
+   	UNION SELECT DISTINCT(playerid) 
+    	FROM hof_not_inducted;
+7.	SELECT people.playerid, namelast, namefirst, SUM(salary) AS total_salary
+  	FROM people RIGHT OUTER JOIN salaries
+  	ON people.playerid = salaries.playerid
+  	GROUP BY people.playerid, namelast, namefirst;
+    
+8.	SELECT hof_inducted.playerid, hof_inducted.yearid, namefirst, namelast
+a.	FROM hof_inducted 
+b.	LEFT OUTER JOIN hof_not_inducted
+c.	ON hof_inducted.playerid = hof_not_inducted.playerid
+d.	LEFT OUTER JOIN people
+e.	ON hof_not_inducted.playerid = people.playerid;
+
+9.	WITH total_inductees AS 
+a.	(
+b.		SELECT * FROM hof_inducted
+c.		UNION
+d.		SELECT * FROM hof_not_inducted
+e.	)
+f.	SELECT CONCAT(namelast,', ',namefirst) AS namefull, yearid, inducted
+g.	FROM total_inductees LEFT JOIN people
+h.	ON total_inductees.playerid= people.playerid
+i.	WHERE yearid > 1980
+j.	ORDER BY yearid, inducted DESC, namefull;
+
+10.	 SELECT teamid, salaries.playerid, yearid, MAX(salary) AS max_salary, namelast, namefirst
+a.	FROM salaries
+b.	LEFT OUTER JOIN people 
+c.	ON salaries.playerid = people.playerid
+d.	GROUP BY teamid, salaries.playerid, yearid,  namelast, namefirst
+e.	ORDER BY MAX(salary) DESC;
+
+11.	 	SELECT birthyear, deathyear, namefirst, namelast 
+a.	FROM people 
+b.	WHERE birthyear >
+		(SELECT birthyear
+		FROM people
+		WHERE playerid= 'ruthba01')
+  	ORDER BY birthyear;
+
+12.	SELECT namefirst, namelast, 
+a.	CASE
+b.		WHEN birthcountry = 'USA' THEN 'USA'
+c.		WHEN birthcountry != 'USA' THEN 'Non-USA'
+d.	END AS usaborn
+e.	FROM people
+f.	ORDER BY usaborn;
+
+13.	SELECT 
+  	AVG(CASE WHEN throws= 'R' THEN height END) AS right_height,
+  	AVG(CASE WHEN throws= 'L' THEN height END) AS left_height
+  	FROM people;
+
+14.	WITH max_sal_per_team AS
+  	(
+  		SELECT teamid, MAX(salary) AS max_sal
+  		FROM salaries
+  		WHERE yearid > 2010
+  		GROUP BY teamid, yearid
+  	)
+  	SELECT teamid, AVG(max_sal)
+  	FROM max_sal_per_team
+    GROUP BY teamid;
